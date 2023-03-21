@@ -14,7 +14,7 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 const videoUrl = 'https://www.youtube.com/watch?v=RmEUBS5wT10';
-const folderName = 'videos';
+const folderName = 'video';
 
 function downloadVideo(folderName, videoUrl, fileName) {
   return new Promise((resolve, reject) => {

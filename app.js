@@ -71,28 +71,29 @@ async function transcribeAudioAndSaveToFile(fileLocation, folderName, fileName) 
   const audioFile = fs.createReadStream(fileLocation);
 
   const resp = await openai.createTranscription(audioFile, "whisper-1");
-  console.log(resp);
+
+  const completion = await openai.createCompletion({
+    model: "text-davinci-003",
+    prompt: "summarize the following text into a blog post with sections:" + resp.data.text,
+    temperature: 0.7,
+    max_tokens: 1383,
+  });
+
+  const completionText = completion.data.choices[0].text;
+
+  console.log(completion.data.choices[0].text, "############## completion ##############");
+
+  const folderName2 = 'summary';
+  if (!fs.existsSync(folderName2)) {
+    fs.mkdirSync(folderName2);
+  }
   
-  // const resp2 = await openai.createCompletion({
-  //   engine: 'davinci',
-  //   prompt: '`Transcribe the following audio file`:',
-  //   file: audioFile,
-  //   maxTokens: 2048,
-  //   n: 1,
-  //   stop: ['[SPEAKER]']
-  // });
-  // console.log(resp);
 
-  // const transcription = resp2.choices[0].text.trim();
-  // const paragraphs = transcription.split('\n\n');
-  // const textWithTimeCodes = paragraphs.map(p => {
-  //   const [startTime, endTime] = p.match(/\[.*?\]/g).map(t => t.slice(1, -1));
-  //   const text = p.replace(/\[.*?\]/g, '').trim();
-  //   return `${text} [${startTime} - ${endTime}]`;
-  // }).join('\n');
+  fs.writeFile(`./${folderName2}/transcription.md`, completionText, 'utf8', function (err) {
 
-  // fs.writeFileSync("test", textWithTimeCodes);
+  });
 
+  // console.log(transcription);
 }
 
 async function main() {
